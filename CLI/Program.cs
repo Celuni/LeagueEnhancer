@@ -8,6 +8,9 @@ namespace CLI
         static void Main(string[] args)
         {
             LeagueEnhancer leagueEnhancer = new LeagueEnhancer();
+
+            while (true)
+                Console.ReadKey();
         }
     }
 }

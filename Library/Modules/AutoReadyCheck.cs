@@ -26,9 +26,17 @@ namespace Library.Modules
 
         private async void OnReadyCheck(object sender, LeagueEvent e)
         {
-            ReadyCheckResponse res = e.Data.ToObject<ReadyCheckResponse>();
+            ReadyCheckResponse? res;
+            try
+            {
+                res = e?.Data?.ToObject<ReadyCheckResponse>();
+            }
+            catch
+            {
+                return;
+            }
 
-            if (autoAccept && res.playerResponse == "None")
+            if (autoAccept && res?.playerResponse == "None")
             {
                 Console.WriteLine("Game found!");
 
@@ -40,7 +48,7 @@ namespace Library.Modules
         }
     }
 
-    struct ReadyCheckResponse           // TODO: Enums
+    public struct ReadyCheckResponse           // TODO: Enums
     {
         public int[] declinerIds;
         public string dodgeWarning;     // None, Warning, Penalty

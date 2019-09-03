@@ -18,28 +18,16 @@ namespace Library
             Initialize();
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
+            Console.WriteLine("Initializing...");
+            Console.WriteLine("\nAdding modules...");
+
             modules.Add(new AutoReadyCheck());
             modules.Add(new AutoChampBanner());
+            modules.Add(new Misc());
 
-            await Task.Run(ChangeSummonerIcon);
-        }
-
-        public async void ChangeSummonerIcon()
-        {
-            uint profileIconId = 58;
-
-            // Initialize a connection to the league client.
-            var api = await LeagueClientApi.ConnectAsync();
-
-            // Update the current summoner's profile icon
-            var body = new { profileIconId = profileIconId };
-            var queryParameters = Enumerable.Empty<string>();
-            var json = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Put, "lol-summoner/v1/current-summoner/icon",
-                                                                     queryParameters, body);
+            Console.WriteLine($"\nAdded {modules.Count} modules\n"); // TODO:
         }
     }
-
-
 }

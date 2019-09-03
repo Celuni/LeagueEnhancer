@@ -18,11 +18,11 @@ namespace Library.Modules
 
         protected virtual void OnEnable()
         {
-
+            Console.WriteLine($"Module \"{this.GetType().Name}\" enabled!");
         }
         protected virtual void OnDisable()
         {
-
+            Console.WriteLine($"Module \"{this.GetType().Name}\" disabled!");
         }
 
 

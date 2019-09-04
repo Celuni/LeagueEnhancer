@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Library.Modules
 {
+    // TODO: Change to interface
     public class BaseModule
     {
         public Action Enabled, Disabled;

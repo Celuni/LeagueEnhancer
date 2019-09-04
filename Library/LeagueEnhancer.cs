@@ -26,6 +26,8 @@ namespace Library
             modules.Add(new AutoReadyCheck());
             modules.Add(new AutoChampBanner());
             modules.Add(new Misc());
+            modules.Add(new DebugDraftLobby());
+            modules.Add(new AutoTFTOrbCollector());
 
             Console.WriteLine($"\nAdded {modules.Count} modules\n"); // TODO:
         }

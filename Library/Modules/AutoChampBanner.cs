@@ -1,9 +1,14 @@
 ﻿using LCUSharp;
 using LCUSharp.Websocket;
+using Library.Models.ChampSelect;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
+using Action = Library.Models.ChampSelect.Action;
 
 namespace Library.Modules
 {
@@ -24,73 +29,81 @@ namespace Library.Modules
             api.EventHandler.Subscribe("/lol-champ-select/v1/session", OnChampSelectSessionTriggered);
         }
 
-        int counter = 0;
-        private void OnChampSelectSessionTriggered(object sender, LeagueEvent e)
+        uint lastActionId = 0;
+        private async void OnChampSelectSessionTriggered(object sender, LeagueEvent e)
         {
-            dynamic dataObject = e.Data.ToString();
-            dynamic dyn = JsonConvert.DeserializeObject(dataObject);
-
-            string json = JsonConvert.SerializeObject(dyn.actions, Formatting.Indented);
-
-            Action[,] _actions = JsonConvert.DeserializeObject<Action[,]>(json);
-            Console.WriteLine(JsonConvert.SerializeObject(_actions, Formatting.Indented));
-
-            //foreach (var item in _actions)
-            //{
-            //    Console.WriteLine(JsonConvert.SerializeObject(item, Formatting.Indented));
-            //}
-
-
-            return;
-
-            dynamic _actionSet = dataObject?.actions;
-
-            List<List<Action>> actions = new List<List<Action>>();
-
+            // Get 
+            Session? session = null;
             try
             {
-                //Action[,] actionSet = (Action[])(dataObject?.actions);
-
-                for (int i = 0; i < _actionSet.Length; i++)
-                {
-                    actions.Add(_actionSet[i]);
-                }
-
-                foreach (dynamic action in actions)
-                {
-                    Console.WriteLine(JsonConvert.SerializeObject(action, Formatting.Indented));
-                }
+                session = e?.Data?.ToObject<Session>();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return;
             }
 
-            //Console.WriteLine("champion select triggered");
+            if (session.actions == null || session.actions.Length <= 0)
+                return;
 
-            //Console.WriteLine(dataObject.actions[0][0]);
+            Action[] currentActions = session.actions[session.actions.Length - 1];
 
-            // Get local player cell id
-            int localCellId = dataObject.localPlayerCellId;
-            //Console.WriteLine(localCellId);
+            if (session == null)
+                return;
 
-            //Console.WriteLine($"{dataObject.timer.phase} ({counter++})");
+            if (session.timer.phase != "BAN_PICK")
+                return;
+
+            //if (localPlayerAction.type != "ban" || localPlayerAction.completed)
+            //    return;
+
+            foreach (var action in currentActions)
+            {
+                bool isLocalPlayerAction = session.localPlayerCellId == action.actorCellId;
+
+                if (isLocalPlayerAction && action.type == "ban" && lastActionId <= action.id)
+                {
+                    lastActionId = action.id;
+                    BanChampion(action);
+                    return;
+                }
+            }
+
+        }
+
+        private async void BanChampion(Action action)
+        {
+            if (action.type != "ban" || action.completed)
+                return;
+
+            var body = new
+            {
+                action.actorCellId,
+                action.championId,
+                completed = true,
+                action.id,
+                type = "ban"
+            };
+
+            // Initialize a connection to the league client.
+            var api = await LeagueClientApi.ConnectAsync();
+            var queryParameters = Enumerable.Empty<string>();
+
+            try
+            {
+                Console.WriteLine($"Banning ChampionId ({action.championId})...");
+                string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Patch, $"/lol-champ-select/v1/session/actions/{action.id}", queryParameters, body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         int[] GetBannableChampions()
         {
             return new int[] { 266 };
         }
-
-        public struct Action
-        {
-            public int actorCellId;
-            public int championId;
-            public bool completed;
-            public uint id;
-            public string type; // TODO: enum
-            public int? pickTurn;
-        }
     }
-
 }

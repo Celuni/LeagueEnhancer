@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+using Library;
+
 namespace GUI
 {
     /// <summary>
@@ -13,5 +15,10 @@ namespace GUI
     /// </summary>
     public partial class App : Application
     {
+        public static LeagueEnhancer LeagueEnhancer;
+        public App()
+        {
+            LeagueEnhancer = new LeagueEnhancer();
+        }
     }
 }

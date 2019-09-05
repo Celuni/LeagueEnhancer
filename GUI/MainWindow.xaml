@@ -7,6 +7,46 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40px"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
+        <Border Background="#3F000000" Grid.Row="0">
+            <DockPanel HorizontalAlignment="Left">
+                <Button Content="Button" />
+                <Button Content="Button"/>
+                <Button Content="Button"/>
+                <DockPanel.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Width" Value="200"></Setter>
+                        <Setter Property="BorderThickness" Value="0"></Setter>
+                        <Setter Property="FontSize" Value="20"></Setter>
+                        <Setter Property="Foreground" Value="White"></Setter>
+                        <Setter Property="FontWeight" Value="DemiBold"></Setter>
+                        <Setter Property="Background" Value="#FF18151F"></Setter>
+                    </Style>
+                </DockPanel.Resources>
+            </DockPanel>
+        </Border>
+
+        <!--<Border HorizontalAlignment="Left" Background="White" Width="200">
+            <StackPanel HorizontalAlignment="Stretch">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        -->
+        <!--<Setter Property="Margin" Value="0,10,0,0"/>-->
+        <!--
+                        <Setter Property="Background" Value="#19000000"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Height" Value="30"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button Content="Button"/>
+                <Button Content="Button"/>
+                <Button Content="Button"/>
+                <Button Content="Button"/>
+            </StackPanel>
+        </Border>-->
     </Grid>
 </Window>

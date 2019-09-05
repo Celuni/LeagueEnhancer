@@ -20,5 +20,13 @@ namespace GUI
         {
             LeagueEnhancer = new LeagueEnhancer();
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            LeagueEnhancer.Shutdown();
+        }
+
     }
 }

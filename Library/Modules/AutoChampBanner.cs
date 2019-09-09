@@ -12,7 +12,7 @@ using Action = Library.Models.ChampSelect.Action;
 
 namespace Library.Modules
 {
-    public class AutoChampBanner : BaseModule
+    public class AutoChampBanner : IBaseModule
     {
         public const bool moduleEnabled = true; // TODO: Settings
         public const bool ignoreTeamPicks = true;

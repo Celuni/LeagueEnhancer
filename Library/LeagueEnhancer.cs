@@ -17,10 +17,11 @@ namespace Library
         public const string AppId = "at.jhinspector.league-enhancer";
         public const string AppTitle = "League Enhancer"; // TODO: Use Assembly Info
         public const string AppVersion = "0.0.1"; // TODO: Use Assembly Info
+        public const string LeaguePatch = "9.17.1"; // TODO: Use functionality
 
         NotifyIcon notifyIcon = new NotifyIcon();
 
-        private List<BaseModule> modules = new List<BaseModule>();
+        private List<IBaseModule> modules = new List<IBaseModule>();
 
         public LeagueEnhancer()
         {
@@ -52,11 +53,13 @@ namespace Library
             AddModule(new Misc());
             AddModule(new DebugDraftLobby());
             AddModule(new AutoTFTOrbCollector());
+            AddModule(new ChampionData());
+            AddModule(new HextechTools());
 
             Console.WriteLine($"\nAdded {modules.Count} modules\n"); // TODO:
         }
 
-        public void AddModule(BaseModule module)
+        public void AddModule(IBaseModule module)
         {
             modules.Add(module);
         }
@@ -68,9 +71,7 @@ namespace Library
             // Create Modules Menu Items
             List<MenuItem> modulesMenuItems = new List<MenuItem>();
             foreach (var module in modules)
-            {
                 modulesMenuItems.Add(new MenuItem(module.GetType().Name));
-            }
 
             // Create Notify Icon
             notifyIcon = new NotifyIcon()

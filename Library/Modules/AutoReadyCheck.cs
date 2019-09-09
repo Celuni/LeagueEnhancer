@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Library.Modules
 {
-    public class AutoReadyCheck : BaseModule
+    public class AutoReadyCheck : IBaseModule
     {
         public const bool autoAccept = true; // TODO: Settings
 

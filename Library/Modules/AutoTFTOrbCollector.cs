@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Library.Modules
 {
-    public class AutoTFTOrbCollector: BaseModule
+    public class AutoTFTOrbCollector: IBaseModule
     {
         protected override void OnEnable()
         {

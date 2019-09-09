@@ -5,11 +5,11 @@ using System.Text;
 namespace Library.Modules
 {
     // TODO: Change to interface
-    public class BaseModule
+    public class IBaseModule
     {
         public Action Enabled, Disabled;
 
-        public BaseModule()
+        public IBaseModule()
         {
             Enabled += OnEnable;
             Disabled += OnDisable;

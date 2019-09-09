@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Library.Modules
 {
-    class DebugDraftLobby : BaseModule
+    class DebugDraftLobby : IBaseModule
     {
         protected override void OnEnable()
         {

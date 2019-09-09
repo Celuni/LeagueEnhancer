@@ -11,7 +11,26 @@
             <RowDefinition Height="40px"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="0">
+            <Button x:Name="btnNavHome" Content="Page 1" Click="BtnNavHome_Click"></Button>
+            <Button x:Name="btnNavBans" Content="Page 2" Click="BtnNavBans_Click"></Button>
+            <Button x:Name="btnNavSettings" Content="Page 3" Click="BtnNavSettings_Click"></Button>
 
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="MinWidth" Value="100"></Setter>
+                    <Setter Property="Margin" Value="0,0,10,0"></Setter>
+                    <Setter Property="BorderThickness" Value="0,0,0,2"></Setter>
+                </Style>
+            </StackPanel.Resources>
+        </StackPanel>
+        
+        <Frame x:Name="Main" Grid.Row="1" NavigationUIVisibility="Hidden"></Frame>
+
+
+
+        <!--
         <Border Background="#3F000000" Grid.Row="0">
             <DockPanel HorizontalAlignment="Left">
                 <Button Content="Button" />
@@ -28,7 +47,7 @@
                     </Style>
                 </DockPanel.Resources>
             </DockPanel>
-        </Border>
+        </Border>-->
 
         <!--<Border HorizontalAlignment="Left" Background="White" Width="200">
             <StackPanel HorizontalAlignment="Stretch">

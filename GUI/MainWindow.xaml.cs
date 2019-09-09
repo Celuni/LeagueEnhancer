@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GUI.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,33 @@ namespace GUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Pages
+
+        Main mainPage = new Main();
+        LeagueBans leagueBansPage = new LeagueBans();
+        Settings settingsPage = new Settings();
+
+        #endregion
+
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void BtnNavHome_Click(object sender, RoutedEventArgs e)
+        {
+            Main.Navigate(mainPage);
+        }
+
+        private void BtnNavBans_Click(object sender, RoutedEventArgs e)
+        {
+            Main.Navigate(leagueBansPage);
+        }
+
+        private void BtnNavSettings_Click(object sender, RoutedEventArgs e)
+        {
+            Main.Navigate(settingsPage);
         }
     }
 }

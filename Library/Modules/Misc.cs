@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Library.Modules
 {
-    public class Misc: BaseModule
+    public class Misc: IBaseModule
     {
         protected override void OnEnable()
         {

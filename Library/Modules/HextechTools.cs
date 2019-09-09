@@ -23,18 +23,39 @@ namespace Library.Modules
 
             items = await GetItems();
             DisenchantDuplicates();
+            DisenchantOwnedChampions();
         }
 
         async void DisenchantDuplicates()
         {
             var api = await LeagueClientApi.ConnectAsync();
 
-            Console.WriteLine("Owned:");
             foreach (var item in OwnedItems)
             {
-                Console.WriteLine(item.itemDesc);
-                string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Get, "/lol-loot/v1/player-loot/{lootName}/redeem");
+                string body = JsonConvert.SerializeObject(item.lootId, Formatting.Indented);
+
+                //string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-loot/v1/recipes/{item.disenchantLootName}/craft", new string[0], $"[{item.lootId}]");
+                string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-loot/v1/player-loot/CHAMPION_31/context-menu");
+
+
+                //string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Get, $"/lol-loot/v1/recipes/initial-item/{lootId}", new string[0], $"[{item.lootId}]");
+                //Console.WriteLine(res);
             }
+        }
+
+        async void DisenchantOwnedChampions()
+        {
+            var api = await LeagueClientApi.ConnectAsync();
+
+            foreach (var item in OwnedItems.Where(p => p.displayCategories == "CHAMPION"))
+            {
+                Console.WriteLine(item.itemDesc);
+
+                //string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-loot/v1/player-loot/CURRENCY_champion", new string[0], $"[{item.lootId}]");
+                string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-loot/v1/recipes/CURRENCY_champion", new string[0], $"[\"{item.lootId}\"]");
+            }
+
+
         }
 
         async Task<LootItem[]> GetItems()

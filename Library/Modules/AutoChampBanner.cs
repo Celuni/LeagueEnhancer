@@ -30,7 +30,7 @@ namespace Library.Modules
         }
 
         uint lastActionId = 0;
-        private async void OnChampSelectSessionTriggered(object sender, LeagueEvent e)
+        private void OnChampSelectSessionTriggered(object sender, LeagueEvent e)
         {
             // Get 
             Session? session = null;
@@ -72,10 +72,17 @@ namespace Library.Modules
 
         }
 
+        bool bannedChamp = false;
         private async void BanChampion(Action action)
         {
-            if (action.type != "ban" || action.completed)
+            if (action.type != "ban" || action.completed || bannedChamp)
                 return;
+
+            action.championId = 266;
+
+
+
+            bannedChamp = true;
 
             var body = new
             {

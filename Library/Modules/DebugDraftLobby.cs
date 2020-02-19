@@ -5,31 +5,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Library.Modules
 {
     class DebugDraftLobby : IBaseModule
     {
-        protected override void OnEnable()
+        LeagueClientApi api;
+
+        protected override async void OnEnable()
         {
             base.OnEnable();
 
-            CreateLobby();
+            api = await LeagueClientApi.ConnectAsync();
+
+            //await CreateLobbyAsync();
         }
 
-        private async void CreateLobby()
+        private async Task CreateLobbyAsync()
         {
-            // TODO:
-            return;
-
-            var api = await LeagueClientApi.ConnectAsync();
-
             var obj = new
             {
-                customGameLobby = new {
+                customGameLobby = new
+                {
                     configuration = new
                     {
-                        gameMode = "CLASSIC",
+                        gameMode = "PRACTICETOOL",
                         gameMutator = "",
                         gameServerRegion = "",
                         mapId = 11,
@@ -40,15 +41,27 @@ namespace Library.Modules
                         spectatorPolicy = "AllAllowed",
                         teamSize = 5
                     },
-                    lobbyName = "Name PBE Dev lobby",
+                    lobbyName = "Name",
                     lobbyPassword = "",
                 },
                 isCustom = true
             };
 
-            var queryParameters = Enumerable.Empty<string>();
+            var queryParameters = new string[] {
+                "Accept: application/json"
+            };
+
             string body = JsonConvert.SerializeObject(obj);
-            string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-lobby/v2/lobby", queryParameters, body);
+            //client.Init();
+            //var res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, "/lol-lobby/v2/lobby", null, body);
+            var res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Get, "/lol-lobby/v2/lobby");
+
+            //client.Init(InitializeMethod.CommandLine);
+            //client.MakeRequestAsync(, , body);
+
+            //string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-lobby/v2/lobby", null, body);
+
+            //string result = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Post, $"/lol-lobby/v2/lobby");
         }
     }
 }

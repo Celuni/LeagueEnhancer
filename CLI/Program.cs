@@ -16,7 +16,7 @@ namespace CLI
 
             #endregion
 
-             leagueEnhancer = new LeagueEnhancer();
+            leagueEnhancer = new LeagueEnhancer();
 
             while (true)
                 Console.ReadKey();

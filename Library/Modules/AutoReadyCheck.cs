@@ -14,12 +14,14 @@ namespace Library.Modules
     {
         public const bool autoAccept = true; // TODO: Settings
 
+        private LeagueClientApi api;
+
         protected async override void OnEnable()
         {
             base.OnEnable();
 
             // Initialize a connection to the league client.
-            var api = await LeagueClientApi.ConnectAsync();
+            api = await LeagueClientApi.ConnectAsync();
 
             api.EventHandler.Subscribe("/lol-matchmaking/v1/ready-check", OnReadyCheck);
         }
@@ -36,7 +38,7 @@ namespace Library.Modules
                 return;
             }
 
-            if (autoAccept && res?.playerResponse == "None")
+            if (autoAccept && res?.playerResponse == PlayerResponse.None)
             {
                 Console.WriteLine("Game found!");
 
@@ -51,10 +53,16 @@ namespace Library.Modules
     public struct ReadyCheckResponse           // TODO: Enums
     {
         public int[] declinerIds;
-        public string dodgeWarning;     // None, Warning, Penalty
-        public string playerResponse;   // None, Accepted, Declined
-        public string state;            // Invalid, InProgress, EveryoneReady, StrangerNotReady, PartyNotReady, Error
+        public DodgeWarning dodgeWarning;     // None, Warning, Penalty
+        public PlayerResponse playerResponse;   // None, Accepted, Declined
+        public State state;            // Invalid, InProgress, EveryoneReady, StrangerNotReady, PartyNotReady, Error
         public bool suppressUx;
         public double timer;
     }
+
+
+    public enum DodgeWarning { None, Warning, Penalty }
+    public enum PlayerResponse { None, Accepted, Declined }
+    public enum State { Invalid, InProgress, EveryoneReady, StrangerNotReady, PartyNotReady, Error }
+
 }

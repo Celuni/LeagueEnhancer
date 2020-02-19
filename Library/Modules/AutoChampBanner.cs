@@ -1,14 +1,8 @@
-﻿using LCUSharp;
-using LCUSharp.Websocket;
+﻿using LCUSharp.Websocket;
 using Library.Models.ChampSelect;
-using Newtonsoft.Json;
+using Library.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Action = Library.Models.ChampSelect.Action;
 
 namespace Library.Modules
 {
@@ -17,100 +11,47 @@ namespace Library.Modules
         public const bool moduleEnabled = true; // TODO: Settings
         public const bool ignoreTeamPicks = true;
 
-        public int[] championBanList = { 266 };
+        public int[] championBanList = { 266, 103, 84 };
 
-        protected async override void OnEnable()
+        ChampionSelectService ChampionSelectService { get; set; }
+        public AutoChampBanner(ChampionSelectService championSelectService)
         {
-            base.OnEnable();
-
-            // Initialize a connection to the league client.
-            var api = await LeagueClientApi.ConnectAsync();
-
-            api.EventHandler.Subscribe("/lol-champ-select/v1/session", OnChampSelectSessionTriggered);
+            ChampionSelectService = championSelectService;
+            ChampionSelectService.OnChampSelectSessionChanged += ChampSelectSessionChanged;
         }
 
-        uint lastActionId = 0;
-        private void OnChampSelectSessionTriggered(object sender, LeagueEvent e)
+        private async void ChampSelectSessionChanged(object sender, LeagueEvent e)
         {
-            // Get 
-            Session? session = null;
-            try
-            {
-                session = e?.Data?.ToObject<Session>();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return;
-            }
-
-            if (session.actions == null || session.actions.Length <= 0)
-                return;
-
-            Action[] currentActions = session.actions[session.actions.Length - 1];
+            var session = e?.Data?.ToObject<Session>();
 
             if (session == null)
-                return;
-
-            if (session.timer.phase != "BAN_PICK")
-                return;
-
-            //if (localPlayerAction.type != "ban" || localPlayerAction.completed)
-            //    return;
-
-            foreach (var action in currentActions)
             {
-                bool isLocalPlayerAction = session.localPlayerCellId == action.actorCellId;
+                Console.WriteLine("Data is null!");
+                return;
+            }
 
-                if (isLocalPlayerAction && action.type == "ban" && lastActionId <= action.id)
+            var currentAction = session?.actions?.LastOrDefault()?.LastOrDefault();
+
+            if (currentAction == null || currentAction.actorCellId != session.localPlayerCellId)
+                return;
+
+            // TODO: Fails bc bans are global (multiple active actorCells) => Use RiftExplorer to check state when everyone is able to ban
+            if (currentAction.actorCellId == session.localPlayerCellId && currentAction.type == "ban")
+            {
+                // Get first available champ in banlist!
+
+                var bans = session.bans.myTeamBans.Concat(session.bans.theirTeamBans);
+
+                foreach (var championId in championBanList)
                 {
-                    lastActionId = action.id;
-                    BanChampion(action);
-                    return;
+                    if (bans.Contains(championId))
+                        continue;
+
+                    await ChampionSelectService.BanChampionAsync(currentAction, championId);
                 }
+
+                Console.WriteLine($"Action {currentAction.id} ({currentAction.type}): {(currentAction.completed ? "completed" : "in Progress")}");
             }
-
-        }
-
-        bool bannedChamp = false;
-        private async void BanChampion(Action action)
-        {
-            if (action.type != "ban" || action.completed || bannedChamp)
-                return;
-
-            action.championId = 266;
-
-
-
-            bannedChamp = true;
-
-            var body = new
-            {
-                action.actorCellId,
-                action.championId,
-                completed = true,
-                action.id,
-                type = "ban"
-            };
-
-            // Initialize a connection to the league client.
-            var api = await LeagueClientApi.ConnectAsync();
-            var queryParameters = Enumerable.Empty<string>();
-
-            try
-            {
-                Console.WriteLine($"Banning ChampionId ({action.championId})...");
-                string res = await api.RequestHandler.GetJsonResponseAsync(HttpMethod.Patch, $"/lol-champ-select/v1/session/actions/{action.id}", queryParameters, body);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-
-        int[] GetBannableChampions()
-        {
-            return new int[] { 266 };
         }
     }
 }

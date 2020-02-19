@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using LCUSharp;
 using LCUSharp.Websocket;
 using Library.Modules;
+using Library.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Library
 {
@@ -23,10 +25,24 @@ namespace Library
 
         private List<IBaseModule> modules = new List<IBaseModule>();
 
+        public IServiceProvider Services { get; private set; }
+        public LeagueClientApi LeagueClient { get; private set; }
+
+
         public LeagueEnhancer()
         {
             Application.ApplicationExit += OnApplicationExit;
 
+            LeagueClient = LeagueClientApi.ConnectAsync().GetAwaiter().GetResult();
+
+            // Register Services
+            Services = new ServiceCollection()
+                .AddSingleton(LeagueClient)
+                .AddSingleton<ChampionSelectService>()
+                .AddSingleton<NotificationService>()
+                .AddSingleton<ChampionService>()
+                .AddSingleton<QueueService>()
+                .BuildServiceProvider();
 
             // Initializing
             Console.WriteLine("Initializing...");
@@ -49,12 +65,14 @@ namespace Library
             Console.WriteLine("\nAdding modules...");
 
             AddModule(new AutoReadyCheck());
-            AddModule(new AutoChampBanner());
-            AddModule(new Misc());
+            AddModule(new AutoChampBanner(Services.GetRequiredService<ChampionSelectService>()));
             AddModule(new DebugDraftLobby());
-            AddModule(new AutoTFTOrbCollector());
-            AddModule(new ChampionData());
-            AddModule(new HextechTools());
+
+            //AddModule(new Misc());
+            //AddModule(new AutoTFTOrbCollector());
+            //AddModule(new ChampionData());
+            //AddModule(new HextechTools());
+            //AddModule(new NotificationManager());
 
             Console.WriteLine($"\nAdded {modules.Count} modules\n"); // TODO:
         }

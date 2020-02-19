@@ -19,7 +19,7 @@ namespace Library.Models.ChampSelect
         public int championId;
         public bool completed;
         public uint id;
-        public string type; // TODO: enum
+        public string type; // TODO: enum & props
         public int pickTurn;
     }
 
@@ -50,9 +50,9 @@ namespace Library.Models.ChampSelect
     }
     public class Bans
     {
-        public List<object> myTeamBans { get; set; }
+        public List<int> myTeamBans { get; set; }
         public int numBans { get; set; }
-        public List<object> theirTeamBans { get; set; }
+        public List<int> theirTeamBans { get; set; }
     }
 
     public class ChatDetails

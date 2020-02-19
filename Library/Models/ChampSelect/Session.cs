@@ -19,8 +19,10 @@ namespace Library.Models.ChampSelect
         public int championId;
         public bool completed;
         public uint id;
-        public string type; // TODO: enum & props
+        public bool isAllyAction;
+        public bool isInProgress;
         public int pickTurn;
+        public string type; // TODO: enum & props
     }
 
     public class Session

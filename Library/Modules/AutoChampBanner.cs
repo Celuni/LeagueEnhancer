@@ -2,6 +2,7 @@
 using Library.Models.ChampSelect;
 using Library.Services;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Library.Modules
@@ -25,21 +26,18 @@ namespace Library.Modules
             var session = e?.Data?.ToObject<Session>();
 
             if (session == null)
-            {
-                Console.WriteLine("Data is null!");
-                return;
-            }
-
-            var currentAction = session?.actions?.LastOrDefault()?.LastOrDefault();
-
-            if (currentAction == null || currentAction.actorCellId != session.localPlayerCellId)
                 return;
 
-            // TODO: Fails bc bans are global (multiple active actorCells) => Use RiftExplorer to check state when everyone is able to ban
-            if (currentAction.actorCellId == session.localPlayerCellId && currentAction.type == "ban")
+            var actions = session.actions.SelectMany(inner => inner);
+            var myActions = actions.Where(action => action.actorCellId == session.localPlayerCellId);
+            var myActiveAction = myActions.FirstOrDefault(action => action.isInProgress);
+            
+            if (myActiveAction == null)
+                return;
+
+            if (myActiveAction.type == "ban")
             {
                 // Get first available champ in banlist!
-
                 var bans = session.bans.myTeamBans.Concat(session.bans.theirTeamBans);
 
                 foreach (var championId in championBanList)
@@ -47,10 +45,10 @@ namespace Library.Modules
                     if (bans.Contains(championId))
                         continue;
 
-                    await ChampionSelectService.BanChampionAsync(currentAction, championId);
+                    await ChampionSelectService.BanChampionAsync(myActiveAction, championId);
                 }
 
-                Console.WriteLine($"Action {currentAction.id} ({currentAction.type}): {(currentAction.completed ? "completed" : "in Progress")}");
+                Console.WriteLine($"Action {myActiveAction.id} ({myActiveAction.type}): {(myActiveAction.completed ? "completed" : "in Progress")}");
             }
         }
     }

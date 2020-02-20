@@ -59,8 +59,6 @@ namespace Library.Services
             if (SentActions.Select(action => action.id).Contains(action.id))
                 return;
 
-            Console.WriteLine(action.id);
-
             var patchActionBody = new
             {
                 action.actorCellId,
@@ -73,10 +71,13 @@ namespace Library.Services
 
             var queryParameters = Enumerable.Empty<string>();
 
-            Console.WriteLine($"Banning champion with id: " + championId);
-            SentActions.Add(action);
-
-            await LeagueClient.RequestHandler.GetJsonResponseAsync(HttpMethod.Patch, $"/lol-champ-select/v1/session/actions/{action.id}", queryParameters, patchActionBody);
+            try
+            {
+                await LeagueClient.RequestHandler.GetJsonResponseAsync(HttpMethod.Patch, $"/lol-champ-select/v1/session/actions/{action.id}", queryParameters, patchActionBody);
+                Console.WriteLine($"Banned champion with id: " + championId);
+                SentActions.Add(action);
+            }
+            catch (Exception) { }
         }
     }
 }

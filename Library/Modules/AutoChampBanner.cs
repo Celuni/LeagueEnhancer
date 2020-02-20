@@ -12,7 +12,7 @@ namespace Library.Modules
         public const bool moduleEnabled = true; // TODO: Settings
         public const bool ignoreTeamPicks = true;
 
-        public int[] championBanList = { 266, 103, 84 };
+        public int[] championBanList = { 141, 266, 103, 84 };
 
         ChampionSelectService ChampionSelectService { get; set; }
         public AutoChampBanner(ChampionSelectService championSelectService)
@@ -30,7 +30,7 @@ namespace Library.Modules
 
             var actions = session.actions.SelectMany(inner => inner);
             var myActions = actions.Where(action => action.actorCellId == session.localPlayerCellId);
-            var myActiveAction = myActions.FirstOrDefault(action => action.isInProgress);
+            var myActiveAction = myActions.FirstOrDefault(action => action.isInProgress && session.timer.phase == "BAN_PICK");
             
             if (myActiveAction == null)
                 return;
@@ -39,6 +39,7 @@ namespace Library.Modules
             {
                 // Get first available champ in banlist!
                 var bans = session.bans.myTeamBans.Concat(session.bans.theirTeamBans);
+                //var hovers = session.actions // TODO: Check for hovered champions!
 
                 foreach (var championId in championBanList)
                 {
@@ -47,8 +48,6 @@ namespace Library.Modules
 
                     await ChampionSelectService.BanChampionAsync(myActiveAction, championId);
                 }
-
-                Console.WriteLine($"Action {myActiveAction.id} ({myActiveAction.type}): {(myActiveAction.completed ? "completed" : "in Progress")}");
             }
         }
     }
